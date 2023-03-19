@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 0;
+        }
+        h1 {
+           text-align: center; 
+           margin-bottom: 0;
+        }
+        .post {
+            padding: 40px;
+        }
+        .comments-title {
+            text-align: center;
+        }
+        .comments-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px 30px;
+        }
+        .comment-block {
+            width: 20%;
+            min-width: 200px;
+        }
+        .comment-header {
+            display: flex;
+        }
+        .comment-header img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .comment-block h3 {
+            font-size: 14px;
+            font-weight: normal;
+            margin: 0 0 5px;
+        }
+        .comment-block p {
+            margin: 0;
+            font-size: 12px;
+        }
+        .comment-block .comment-body {
+            font-size: 14px;
+            margin: 10px 0;
+            padding: 10px;
+            background: #eee;
+            border-radius: 5px;
+            min-height: 100px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Post Detail Page</h1>
+    <script>
+        // На странице post-details.html:
+        // 7 Вивести всю, без виключення, інформацію про об'єкт post на який клікнули .
+        // 8 Нижчє інформаці про пост, вивести всі коментарі поточного поста 
+        // (ендпоінт  - https://jsonplaceholder.typicode.com/posts/POST_ID/comments)
+        // post-details.html - блок з інфою про пост зверху. Коментарі - по 4 в ряд.
+        // Всі елементи котрі характеризують users, posts, comments візуалізувати, так, 
+        // щоб було видно що це блоки (дати фон. марджини і тд) 
+        let url = new URL(location.href);
+        let json = url.searchParams.get('post');
+        let post = JSON.parse(json);
+
+        let postBlock = document.createElement('div');
+        postBlock.classList.add('post');
+        postBlock.innerHTML += `
+            <h2 class="post-title">${post.title}</h2>        
+            <p class="post-id"><b>ID:</b> ${post.id}</p>
+            <p class="post-user-id"><b>User ID:</b> ${post.userId}</p>
+            <p class="post-body"><b>Post Body:</b> ${post.body}</p>
+            <hr/>
+        `
+        document.body.appendChild(postBlock);
+        let commentsTitle = document.createElement('h2');
+        commentsTitle.classList.add('comments-title');
+        commentsTitle.innerText = 'Comments';
+        postBlock.appendChild(commentsTitle);
+        let commentUrl = 'https://jsonplaceholder.typicode.com/posts/'+`${post.id}`+'/comments';
+        fetch(commentUrl)
+            .then(response => response.json())
+            .then(comments => {
+                let commentsWrapper = document.createElement('div');
+                commentsWrapper.classList.add('comments-wrapper');
+                for (const comment of comments) {
+                    let div = document.createElement('div');
+                    div.classList.add('comment-block');
+                    div.innerHTML += `
+                        <div class="comment-header">
+                            <img src="https://placehold.jp/3d4070/ffffff/150x150.png?text=Avatar" alt="${comment.name}" />
+                            <div>
+                                <h3>${comment.name}</h3>
+                                <p>${comment.email}</p>
+                            </div>
+                        </div>
+                        <p class="comment-body">${comment.body}</p>
+                    `
+                    commentsWrapper.appendChild(div);
+                }
+                postBlock.appendChild(commentsWrapper);
+            })
+    </script>
+</body>
+</html>

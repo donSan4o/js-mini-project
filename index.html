@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+    </head>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        .users {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px 30px;
+            justify-content: center;
+        }
+        h1 {
+            text-align: center;
+        }
+        .user {
+            border: 1px solid black;
+            border-radius: 5px;
+            padding: 20px;
+            text-align: center;
+            width: 45%;
+            min-width: 200px;
+            
+        }
+        .link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 80%;
+            height: 30px;
+            margin: 0 auto;
+            border: 1px solid black;
+            border-radius: 5px;
+            text-decoration: none;
+            color: black;
+        }
+        .link:hover {
+            background: black;
+            color: white;
+        }
+    </style>
+    <body>
+        <h1>Users</h1>
+        <!-- В index.html
+        1 отримати масив об'єктів з endpoint`а https://jsonplaceholder.typicode.com/users
+        2 Вивести id,name всіх user в index.html. Окремий блок для кожного user.
+        3 Додати кожному блоку кнопку/посилання , при кліку на яку відбувається перехід  на сторінку user-details.html, котра має детальну інфорацію про об'єкт на який клікнули
+
+        index.html - всі блоки з user - по 2 в рядок. кнопки/аосилвння розташувати під інформацією про user.-->
+
+        <script>
+            let usersList = document.createElement('div');
+            usersList.classList.add('users');
+            fetch('https://jsonplaceholder.typicode.com/users')
+                .then(response => response.json())
+                .then(users => {
+                    for (const user of users) {
+                        let div = document.createElement('div');
+                        div.classList.add('user');
+                        let userHeader = document.createElement('h2');
+                        userHeader.innerText = `${user.id} ${user.name}`;
+                        let a = document.createElement('a');
+                        a.classList.add('link');
+                        a.innerText = 'Show User Details';
+                        a.href = 'user-details.html?user=' + JSON.stringify(user);
+                        div.appendChild(userHeader);
+                        div.appendChild(a);
+                        usersList.appendChild(div);
+                    }
+                    document.body.appendChild(usersList);
+                });
+        </script>
+    </body>
+</html>

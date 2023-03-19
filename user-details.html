@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0 40px 40px;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        h1 {
+            text-align: center;
+        }
+        .user {
+            border: 1px solid #000000;
+            border-radius: 5px;
+            padding: 0 40px 40px;
+        }
+        .user-name {
+            text-align: center;
+        }
+        ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        ul li {
+            margin-bottom: 10px;
+        }
+        .show-posts {
+            display: block;
+            width: 90%;
+            height: 40px;
+            margin: 20px auto;
+            border: 1px solid #000;
+            border-radius: 5px;
+            background: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .show-posts:hover {
+            background: black;
+            color: white;
+        }
+        .posts-list {
+            padding: 20px 0;
+            gap: 30px 30px;
+            flex-wrap: wrap;
+        }
+        .posts-list li {
+            padding: 20px;
+            border: 1px solid black;
+            border-radius: 5px;
+            width: calc( 100% / 5 - 30px);
+            min-width: 200px;
+            text-align: center;
+        }
+        .posts-list li img {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .posts-list li a {
+            text-decoration: none;
+            color: black;
+        }
+        .posts-list li a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <!-- На странице user-details.html:
+    4 Вивести всю, без виключення, інформацію про об'єкт user на який клікнули
+    5 Додати кнопку "post of current user", при кліку на яку, з'являються title всіх постів поточного юзера
+    (для получения постов используйте эндпоинт https://jsonplaceholder.typicode.com/users/USER_ID/posts)
+    6 Каждому посту додати кнопку/посилання, при кліку на яку відбувається перехід на сторінку post-details.html,
+    котра має детальну інфу про поточний пост. -->
+
+    <!-- user-details.html - блок з інфою про user зверху сторінки. Кнопка нижчє, на 90% ширини сторінки, по центру.
+    блоки з короткою іфною про post - в ряд по 5 . -->
+    <h1>User Details</h1>
+    
+    <script>
+        let url = new URL(location.href);
+        let json = url.searchParams.get('user');
+        let user = JSON.parse(json);
+        let details = document.createElement('div');
+        details.classList.add('user');
+
+        details.innerHTML += `
+            <h2 class="user-name">${user.name}</h2>        
+            <p class="user-username"><b>Username:</b> ${user.username}</p>
+            <p class="user-id"><b>User ID:</b> ${user.id}</p>
+            <p class="user-email"><b>User Email:</b> ${user.email}</p>
+            <p class="user-phone"><b>User Phone:</b> ${user.phone}</p>
+            <p class="user-website"><b>User website:</b> ${user.website}</p>
+            <hr/>
+            <div class="user-company">
+                <h3>User Company:</h3>
+                <ul>
+                    <li><b>Name:</b> ${user.company.name}</li>
+                    <li><b>Catch Phrase:</b> ${user.company.catchPhrase}</li>
+                    <li><b>bs:</b> ${user.company.bs}</li>
+                </ul>
+            </div>
+            <hr/>
+            <div class="user-address">
+                <h3>User Address</h3>
+                <ul>
+                    <li><b>City:</b> ${user.address.city}</li>
+                    <li><b>Geo:</b> lat: ${user.address.geo.lat} lng: ${user.address.geo.lng}</li>
+                    <li><b>Street:</b> ${user.address.street}</li>
+                    <li><b>Suite:</b> ${user.address.suite}</li>
+                    <li><b>Zipcode:</b> ${user.address.zipcode}</li>
+                </ul>
+            </div>
+        `
+        document.body.appendChild(details);
+
+        let postsBlock = document.createElement('ul');
+        postsBlock.classList.add('posts-list');
+        postsBlock.style.display = "none";
+        let postUrl = 'https://jsonplaceholder.typicode.com/users/'+`${user.id}`+'/posts';
+        fetch(postUrl)
+            .then(response => response.json())
+            .then(posts => {
+            for (const post of posts) {
+                let li = document.createElement('li');
+                let a = document.createElement('a');
+                a.classList.add('link');
+                a.innerText = `${post.title}`;
+                a.href = 'post-details.html?post=' + JSON.stringify(post);
+                let img = document.createElement('img');
+                img.src = "https://placehold.jp/30/dd6699/ffffff/300x150.png?text=placeholder+image";
+                img.alt =  `${post.title}`;
+                li.appendChild(img);
+                li.appendChild(a);
+                postsBlock.appendChild(li);
+            }
+        })
+        
+        let button = document.createElement('button')
+        button.classList.add('show-posts');
+        button.setAttribute('onclick', 'showPosts()');
+        button.innerText = 'Show posts of Current User';
+        document.body.appendChild(button); 
+        document.body.appendChild(postsBlock);
+        function showPosts() {
+            if (postsBlock.style.display === 'none') {
+                postsBlock.style.display = 'flex';
+            } else {
+                postsBlock.style.display = 'none';
+            }
+        }
+        
+    </script>
+</body>
+</html>
